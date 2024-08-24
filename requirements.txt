@@ -1,0 +1,7 @@
+python-dotenv==1.0.1
+quart==0.19.6
+discord.py==2.4.0
+discord.py[voice]
+colorama==0.4.6
+pymongo==4.8.0
+google-generativeai==0.7.2
