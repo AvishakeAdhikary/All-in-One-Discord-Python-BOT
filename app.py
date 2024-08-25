@@ -1,5 +1,6 @@
-from quart import Quart, request, jsonify, render_template
 import asyncio
+from quart import Quart, render_template
+from endpoints import register_routes
 import bot
 
 app = Quart(__name__)
@@ -9,21 +10,20 @@ app = Quart(__name__)
 async def index():
     return await render_template('index.html')
 
-@app.route('/home', methods=['GET'])
-def home():
-    return jsonify({'html': '<p>This is home</p>'})
-
-@app.route('/ai')
-def ai():
-    return jsonify({'html': '<p>This is ai</p>'})
-
 async def run_quart():
+    register_routes(app)
     await app.run_task(host='0.0.0.0', port=5000, debug=True)
 
+async def run_bot():
+    await bot.run_bot()
+
+async def main():
+    # Start the Quart application and Discord bot
+    await asyncio.gather(run_quart(), run_bot())
+
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.create_task(run_quart())
-    loop.run_until_complete(bot.run_bot())
+    asyncio.run(main())
+
 
 # BOT Rich Presence
 # static void UpdatePresence()

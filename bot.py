@@ -25,7 +25,7 @@ async def load_cogs():
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py') and filename != '__init__.py':
             cog = filename[:-3]
-            bot.load_extension(f'cogs.{cog}')
+            await bot.load_extension(f'cogs.{cog}')
 
 async def run_bot():
     await bot.start(DISCORD_APPLICATION_TOKEN)
