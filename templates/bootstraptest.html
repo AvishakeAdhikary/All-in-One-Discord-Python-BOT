@@ -26,13 +26,7 @@
         ::-webkit-scrollbar-thumb:hover {
         background: #555;
         }
-
-        /* Active link color */
-        a.active {
-            color: #4f46e5; /* Example color */
-            font-weight: bold;
-        }
-    </style>
+            </style>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -42,7 +36,7 @@
         <div class="nav pt-1 pb-1 pl-1">
             <!-- nav - start -->
             <nav class="sticky top-0 left-0 mx-auto flex h-full w-16 flex-col items-center gap-4 border-r bg-neutral-900 px-4 py-10 text-xs sm:w-24 sm:rounded-xl sm:border-transparent sm:text-sm sm:shadow-2xl">
-                <a href="#" data-url="/home" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600 active">
+                <a href="#" data-url="/home" class="flex flex-col items-center gap-1 text-indigo-500">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span>
                 </a>
@@ -54,7 +48,7 @@
                     <i class="fa-solid fa-door-open"></i>
                     <span>Welcomer</span>
                 </a>
-                <a href="https://discord.com/oauth2/authorize?client_id=1276859825833115669&permissions=8&integration_type=0&scope=bot" target="_blank" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
+                <a href="#" data-url="/invite" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
                     <i class="fa-solid fa-envelope"></i>
                     <span>Invite</span>
                 </a>
@@ -74,7 +68,7 @@
                     <i class="fa-brands fa-dev"></i>
                     <span>Active Dev Badge</span>
                 </a>
-                <a href="https://discord.gg/sDtCr5gZuH" target="_blank" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
+                <a href="#" data-url="/supportserver" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
                     <i class="fa-solid fa-headset"></i>
                     <span>Support Server</span>
                 </a>
@@ -85,10 +79,6 @@
                 <a href="#" data-url="/logging" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
                     <i class="fa-solid fa-code"></i>
                     <span>Logging</span>
-                </a>
-                <a href="#" data-url="/sendmessage" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
-                    <i class="fa-solid fa-message"></i>
-                    <span>Send Message</span>
                 </a>
                 <a href="#" data-url="/weather" class="flex flex-col items-center gap-1 text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600">
                     <i class="fa-solid fa-umbrella"></i>
@@ -148,46 +138,27 @@
             <!-- nav - end -->
         </div>
         <main id="main-content" class="flex-1 m-1 p-8 bg-neutral-900 text-white sm:rounded-xl sm:border-transparent sm:text-sm sm:shadow-2xl">
+            <div class="rounded">
+                <!-- Header Hero -->
+                <div class="rounded bg-black dark:bg-black d-flex justify-content-center justify-items-center align-items-center w-full p-4 my-2">
+                    <div class="d-flex flex-column">
+                        <div class="h2">Database</div>
+                        <div class="h6">Store data or get lost</div>
+                    </div>
+                </div>
+                <!-- Header Hero End -->
+                <!-- MongoDB -->
+                <div class="rounded flex-column bg-black dark:bg-black d-flex justify-content-between justify-items-center align-items-center w-full p-4 my-2">
+                    <div class="h4">MongoDB URI</div>
+                    <div class="d-flex justify-content-between w-full mt-1">
+                        <div class="h4">Enter your URI here:</div>
+                        <input class="form-control" placeholder="API Key" type="text" value="">
+                        <button type="button" class="btn btn-outline-primary ml-2" id="save-chatgpt-key">Save</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch initial content
-            fetch('/home')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('main-content').innerHTML = data.html;
-                
-                // Set 'active' class to default link after content is loaded
-                const defaultLink = document.querySelector('a[data-url="/home"]');
-                if (defaultLink) {
-                    defaultLink.classList.add('active');
-                }
-            })
-            .catch(error => console.error('Error fetching content:', error));
-            
-            // Handle link clicks
-            document.querySelectorAll('a[data-url]').forEach(link => {
-                link.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const url = this.getAttribute('data-url');
-                    
-                    // Remove 'active' class from all links
-                    document.querySelectorAll('a[data-url]').forEach(link => link.classList.remove('active'));
-                    
-                    // Add 'active' class to the clicked link
-                    this.classList.add('active');
-                    
-                    fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('main-content').innerHTML = data.html;
-                    })
-                    .catch(error => console.error('Error fetching content:', error));
-                });
-            });
-        });
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

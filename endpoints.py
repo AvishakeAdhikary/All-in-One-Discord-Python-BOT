@@ -1,4 +1,5 @@
 from quart import jsonify
+from fragments import read_html_fragments
 
 def register_routes(app):
     @app.route('/home', methods=['GET'])
@@ -7,11 +8,13 @@ def register_routes(app):
 
     @app.route('/ai', methods=['GET'])
     async def ai():
-        return jsonify({'html': '<p>This is ai</p>'})
+        aiFragment = read_html_fragments(relativeFilePath='/templates/fragments', fileName="ai.html")
+        return jsonify({'html': aiFragment})
 
     @app.route('/welcomer', methods=['GET'])
     async def welcomer():
-        return jsonify({'html': '<p>This is welcomer</p>'})
+        welcomerFragment = read_html_fragments(relativeFilePath='/templates/fragments', fileName="welcomer.html")
+        return jsonify({'html': welcomerFragment})
 
     @app.route('/invite', methods=['GET'])
     async def invite():
@@ -19,7 +22,8 @@ def register_routes(app):
 
     @app.route('/database', methods=['GET'])
     async def database():
-        return jsonify({'html': '<p>This is database</p>'})
+        databaseFragment = read_html_fragments(relativeFilePath='/templates/fragments', fileName="database.html")
+        return jsonify({'html': databaseFragment})
 
     @app.route('/servers', methods=['GET'])
     async def servers():
@@ -44,6 +48,10 @@ def register_routes(app):
     @app.route('/logging', methods=['GET'])
     async def logging():
         return jsonify({'html': '<p>This is logging</p>'})
+    
+    @app.route('/sendmessage', methods=['GET'])
+    async def sendmessage():
+        return jsonify({'html': '<p>This is send message</p>'})
 
     @app.route('/weather', methods=['GET'])
     async def weather():
@@ -95,5 +103,5 @@ def register_routes(app):
 
     @app.route('/about', methods=['GET'])
     async def about():
-        return jsonify({'html': '<p>This is about</p>'})
+        return jsonify({'html': '<iframe class="rounded h-full w-full" src="https://avishakeadhikary.github.io" frameborder="0"></iframe>'})
 
