@@ -1,11 +1,5 @@
 from pymongo import MongoClient
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-MONGODB_URI = os.getenv('MONGODB_URI')
-MONGO_DB_DATABASE_NAME = os.getenv('MONGO_DB_DATABASE_NAME')
+from settings import MONGO_DB_URI, MONGO_DB_DATABASE_NAME
 
 class DatabaseManager:
     def __init__(self):

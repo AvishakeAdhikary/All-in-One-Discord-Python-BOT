@@ -4,7 +4,8 @@ from fragments import read_html_fragments
 def register_routes(app):
     @app.route('/home', methods=['GET'])
     async def home():
-        return jsonify({'html': '<p>This is home</p>'})
+        homeFragment = read_html_fragments(relativeFilePath='/templates/fragments', fileName="home.html")
+        return jsonify({'html': homeFragment})
 
     @app.route('/ai', methods=['GET'])
     async def ai():
