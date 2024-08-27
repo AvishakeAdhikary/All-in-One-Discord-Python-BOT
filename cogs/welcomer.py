@@ -10,7 +10,9 @@ class Welcomer(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        channel = DISCORD_SERVER_WELCOME_CHANNEL_ID
+        print("running member join")
+        channel_id = DISCORD_SERVER_WELCOME_CHANNEL_ID
+        channel = self.bot.get_channel(channel_id)
         if channel is not None:
             await channel.send(f'Welcome to {member.guild.name}, {member.mention}.')
     
