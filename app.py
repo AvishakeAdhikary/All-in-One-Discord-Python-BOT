@@ -22,6 +22,9 @@ async def main():
     await asyncio.gather(run_quart(), run_bot())
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except:
+        print("Something happened while trying to run the bot. Please debug the code or check your connection...")
 
 # Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process

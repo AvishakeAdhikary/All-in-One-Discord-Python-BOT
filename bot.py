@@ -9,6 +9,7 @@ print("Starting with bot token:", DISCORD_APPLICATION_TOKEN)
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents) 
 
@@ -20,7 +21,12 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(f'Message from {message.author}: {message.content}')
+    if message.author == bot.user:
+        return
+    if isinstance(message.channel, discord.DMChannel):
+        print(f"Received a DM from {message.author}: {message.content}")
+    else:
+        print(f"Received a message in server '{message.guild.name}' from {message.author}: {message.content}")
     await bot.process_commands(message)
 
 async def load_cogs():
