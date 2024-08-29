@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands, tasks
-from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS
+from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS, MONGO_DB_COLLECTION_CONFIG_NAME
+from databasemanager import DatabaseManager
 import os
 import datetime
 
@@ -30,7 +31,6 @@ async def on_message(message):
     await bot.process_commands(message)
 
 async def load_cogs():
-    # Load cogs (command modules)
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py') and filename != '__init__.py':
             cog = filename[:-3]
@@ -50,15 +50,26 @@ async def update_presence():
     activity = discord.Activity(
         type=discord.ActivityType.playing,
         name=DISCORD_STATUS,
-        details = "Chilling",
-        large_image = "legendary",
-        large_text = "This is legendary",
-        small_image = "legendary",
-        small_text = "This is legendary",
-        party_id = "barney_stinson",
-        party_size = "1",
-        party_max = "5",
-        join_secret = "legendaddy",
+        details = "In: The Lusty Leopard",
+        large_image_url = "https://github.com/AvishakeAdhikary/All-in-One-Discord-Python-BOT/blob/main/static/legendary.jpg?raw=true",
+        large_image_text = "This is legendary",
+        small_image_url = "https://github.com/AvishakeAdhikary/All-in-One-Discord-Python-BOT/blob/main/static/legendary.jpg?raw=true",
+        small_image_text = "This is legendary",
+        party = {
+            "id": "barney_stinson",
+            "size": [1, 5]
+        },
+        buttons = [
+            {
+                'label': 'Join Our Server',
+                'url': 'https://discord.gg/sDtCr5gZuH'
+            },
+            {
+                'label': 'Website',
+                'url': 'https://avishakeadhikary.github.io/'
+            }
+        ],
+        platform = "Windows",
         url="https://avishakeadhikary.github.io/",
         start=current_time
     )
