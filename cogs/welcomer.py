@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 from easy_pil import Editor, load_image_async, Font
 from discord import File
 from settings import DISCORD_SERVER_WELCOME_CHANNEL_ID, DISCORD_BOT_COLOR_LIGHT, DISCORD_BOT_COLOR_EXTRA_2

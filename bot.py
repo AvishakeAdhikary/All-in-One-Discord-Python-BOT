@@ -19,6 +19,7 @@ async def on_ready():
     await load_cogs()
     print(f'Logged in as {bot.user}')
     update_presence.start()
+    await sync_commands()
 
 @bot.event
 async def on_message(message):
@@ -40,9 +41,12 @@ async def load_cogs():
             except Exception as e:
                 print(f"Failed to load cog {cog}: {e}")
 
-@bot.command()
-async def sync(ctx: commands.Context):
-    load_cogs()
+async def sync_commands():
+    try:
+        synced = await bot.tree.sync()
+        print(f'Synced {len(synced)} commands.')
+    except Exception as e:
+        print(f"Exception occured during command sync {e}")
 
 @tasks.loop(seconds=15)
 async def update_presence():

@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from pymongo.errors import ConnectionError, PyMongoError
+from pymongo.errors import ServerSelectionTimeoutError, PyMongoError
 from settings import MONGO_DB_URI, MONGO_DB_DATABASE_NAME
 
 class DatabaseManager:
@@ -13,7 +13,7 @@ class DatabaseManager:
             else:
                 self.db.create_collection(self.collection_name)
                 print(f"Collection '{self.collection_name}' created. Ready to perform operations.")
-        except ConnectionError:
+        except ServerSelectionTimeoutError:
             print("Failed to connect to MongoDB. Please check your URI and network connection.")
         except PyMongoError as e:
             print(f"An error occurred while setting up the database: {e}")
