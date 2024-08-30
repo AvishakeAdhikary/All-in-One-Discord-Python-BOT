@@ -16,6 +16,7 @@ class GoogleGemini(commands.Cog):
 
     @commands.hybrid_command(name='askgemini', description='Ask your queries to Google Gemini')
     async def askgemini(self, ctx: commands.Context, message: str):
+        await ctx.send(f"{ctx.author.mention} asked `{message}`")
         if self.model is None:
             await ctx.send("Google Gemini API is not configured properly. Please contact an administrator.")
             return
