@@ -1,16 +1,15 @@
 import discord
 from discord.ext import commands, tasks
-from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS, MONGO_DB_COLLECTION_CONFIG_NAME
+from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS, MONGO_DB_COLLECTION_CONFIG_NAME, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 from databasemanager import DatabaseManager
 import os
 import datetime
 
 print("Starting with bot token:", DISCORD_APPLICATION_TOKEN)
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.guilds = True
-intents.members = True
+database_manage = DatabaseManager(collection_name=MONGO_DB_COLLECTION_CONFIG_NAME)
+
+intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix="!", intents=intents) 
 

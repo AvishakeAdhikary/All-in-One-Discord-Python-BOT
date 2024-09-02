@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt update
+sudo apt install ffmpeg
+
 # Set the requirements file
 REQUIREMENTS_FILE="requirements.txt"
 
