@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS, MONGO_DB_COLLECTION_CONFIG_NAME, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
+from settings import DISCORD_APPLICATION_TOKEN, DISCORD_STATUS, MONGO_DB_COLLECTION_CONFIG_NAME
 from databasemanager import DatabaseManager
 import os
 import datetime
@@ -11,7 +11,7 @@ database_manage = DatabaseManager(collection_name=MONGO_DB_COLLECTION_CONFIG_NAM
 
 intents = discord.Intents.all()
 
-bot = commands.Bot(command_prefix="!", intents=intents) 
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
