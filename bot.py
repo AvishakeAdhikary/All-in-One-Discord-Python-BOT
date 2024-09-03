@@ -54,10 +54,12 @@ async def update_presence():
         type=discord.ActivityType.playing,
         name=DISCORD_STATUS,
         details = "In: The Lusty Leopard",
-        large_image_url = "https://github.com/AvishakeAdhikary/All-in-One-Discord-Python-BOT/blob/main/static/legendary.jpg?raw=true",
-        large_image_text = "This is legendary",
-        small_image_url = "https://github.com/AvishakeAdhikary/All-in-One-Discord-Python-BOT/blob/main/static/legendary.jpg?raw=true",
-        small_image_text = "This is legendary",
+        assets = {
+            "large_image": "legendary",
+            "large_text": "Legendary",
+            "small_image": "suitup",
+            "small_text": "Suit-Up"
+        },
         party = {
             "id": "barney_stinson",
             "size": [1, 5]
