@@ -64,4 +64,5 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ### Contact
-For any questions or issues, please open an issue on the GitHub repository or contact the repository maintainer at [avhishe.adhikary11@gmail.com](mailto:avhishe.adhikary11@gmail.com).
+For any questions or issues, please open an issue on the GitHub repository or contact the repository maintainer at [avhishe.adhikary11@gmail.com](mailto:avhishe.adhikary11@gmail.com) or [brodiscordbot@hotmail.com](mailto:brodiscordbot@hotmail.com).
+<!-- BroBot@2024 -->
