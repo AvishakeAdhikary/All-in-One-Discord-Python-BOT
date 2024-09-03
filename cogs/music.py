@@ -62,9 +62,11 @@ class Music(commands.Cog):
         except Exception as e:
             print(f"Exception occurred while closing wavelink node pool. \n{e}")
 
+    @commands.Cog.listener()
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
         logging.info("Wavelink Node connected: %r | Resumed: %s", payload.node, payload.resumed)
 
+    @commands.Cog.listener()
     async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
         player: wavelink.Player | None = payload.player
         if not player:
@@ -89,15 +91,16 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(name='play', description="Make the bot join the channel.")
     async def play(self, ctx: commands.Context, *, query: str):
+        """Play a song with the given query."""
         if not ctx.guild:
             return
 
         player: wavelink.Player
-        player = typing.cast(wavelink.Player, ctx.voice_client)  # type: ignore
+        player = typing.cast(wavelink.Player, ctx.voice_client)
 
         if not player:
             try:
-                player = await ctx.author.voice.channel.connect(cls=wavelink.Player)  # type: ignore
+                player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
             except AttributeError:
                 await ctx.send("Please join a voice channel first before using this command.")
                 return
@@ -113,13 +116,14 @@ class Music(commands.Cog):
             await ctx.send(f"You can only play songs in {player.home.mention}, as the player has already started there.")
             return
 
+        await ctx.send(f"Searching for: {query}. Request from {ctx.author.mention}")
+
         tracks: wavelink.Search = await wavelink.Playable.search(query)
         if not tracks:
             await ctx.send(f"{ctx.author.mention} - Could not find any tracks with that query. Please try again.")
             return
         
         if isinstance(tracks, wavelink.Playlist):
-            # tracks is a playlist...
             added: int = await player.queue.put_wait(tracks)
             await ctx.send(f"Added the playlist **`{tracks.name}`** ({added} songs) to the queue.")
         else:
@@ -128,22 +132,103 @@ class Music(commands.Cog):
             await ctx.send(f"Added **`{track}`** to the queue.")
 
         if not player.playing:
-            # Play now since we aren't playing anything...
             await player.play(player.queue.get())
-
-        # Optionally delete the invokers message...
-        try:
-            await ctx.message.delete()
-        except discord.HTTPException:
-            pass
 
     @commands.hybrid_command(name='disconnect', description="Make the bot leave the channel.")
     async def disconnect(self, ctx: commands.Context):
+        """Disconnect the Player."""
         player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
         if not player:
             return
         await player.disconnect()
         await ctx.message.add_reaction("\u2705")
+
+    @commands.hybrid_command(name='skip', description="Skip the currenly track.")
+    async def skip(self, ctx: commands.Context) -> None:
+        """Skip the current song."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+
+        await player.skip(force=True)
+        await ctx.message.add_reaction("\u2705")
+
+    @commands.hybrid_command(name="toggle", aliases=["pause", "resume"], description="Play or Pause the track.")
+    async def pause_resume(self, ctx: commands.Context) -> None:
+        """Pause or Resume the Player depending on its current state."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+        await player.pause(not player.paused)
+        await ctx.message.add_reaction("\u2705")
+
+    @commands.hybrid_command(name='volume', description="Set the volume of the player.")
+    async def volume(self, ctx: commands.Context, value: int) -> None:
+        """Change the volume of the player."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+        await player.set_volume(value)
+        await ctx.message.add_reaction("\u2705")
+
+    @commands.hybrid_command(name='nightcore', description="Set the filter of the player to nightcore style.")
+    async def nightcore(self, ctx: commands.Context) -> None:
+        """Set the filter to a nightcore style."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+
+        filters: wavelink.Filters = player.filters
+        filters.timescale.set(pitch=1.2, speed=1.2, rate=1)
+        await player.set_filters(filters)
+
+        await ctx.message.add_reaction("\u2705")
+
+    @commands.hybrid_command(name='nowplaying', description="Show the currently playing track.")
+    async def nowplaying(self, ctx: commands.Context) -> None:
+        """Show the currently playing track."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player or not player.playing:
+            await ctx.send("No track is currently playing.")
+            return
+        track = player.current
+        embed = discord.Embed(title="Now Playing", description=f"**{track.title}** by `{track.author}`")
+        if track.artwork:
+            embed.set_image(url=track.artwork)
+        if track.album.name:
+            embed.add_field(name="Album", value=track.album.name)
+
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='queue', description="Show the current queue.")
+    async def queue(self, ctx: commands.Context) -> None:
+        """Show the current queue."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player or player.queue.is_empty:
+            await ctx.send("The queue is currently empty.")
+            return
+
+        queue_list = ""
+        for i, track in enumerate(player.queue):
+            queue_list += f"{i+1}. **{track.title}** by `{track.author}`\n"
+            if i >= 10:
+                break
+
+        embed = discord.Embed(title="Queue", description=queue_list)
+        if player.queue.count > 10:
+            embed.set_footer(text="Showing first 10 tracks. Use `!queue` to view the entire queue.")
+
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name='clear', description="Clear the queue.")
+    async def clear(self, ctx: commands.Context) -> None:
+        """Clear the queue."""
+        player: wavelink.Player = typing.cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            return
+
+        player.queue.clear()
+        await ctx.send("The queue has been cleared.")
 
 async def setup(bot):
     await bot.add_cog(Music(bot))
