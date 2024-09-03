@@ -4,7 +4,7 @@ discord.py==2.4.0
 discord.py[voice]
 colorama==0.4.6
 pymongo==4.8.0
-easy-pil==0.3.3
+opencv-pyth==4.10.0
 google-generativeai==0.7.2
 openai==1.43.0
 wavelink==3.4.1

@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
-from easy_pil import Editor, load_image_async, Font
 from discord import File
+import numpy as np
+import cv2
+import io
+import requests
+from PIL import Image as PILImage, ImageDraw, ImageFont
 from settings import DISCORD_SERVER_WELCOME_CHANNEL_ID, DISCORD_BOT_COLOR_LIGHT, DISCORD_BOT_COLOR_EXTRA_2
 
 class Welcomer(commands.Cog):
@@ -27,15 +30,63 @@ class Welcomer(commands.Cog):
                 return
         print(f'Welcome Channel Name: {channel.name}')
         message = f'Welcome to {member.guild.name}'
-        background_image = Editor("static/himym-umbrella.jpg")
-        user_profile_image = await load_image_async(str(member.avatar.url))
-        circle_profile_image = Editor(user_profile_image).resize((150, 150)).circle_image()
-        font = Font.montserrat(size=50, variant="bold")
-        background_image.paste(circle_profile_image, (725, 100))
-        background_image.ellipse((725, 100), width=150, height=150, outline="white", stroke_width=5)
-        background_image.text((800, 400), f"{message}", color=DISCORD_BOT_COLOR_LIGHT, font=font, align="center")
-        background_image.text((800, 500), f"@{member.name}", color=DISCORD_BOT_COLOR_EXTRA_2, font=font, align="center")
-        file = File(fp=background_image.image_bytes, filename="welcome.jpg")
+
+        # Load background image
+        background_image = cv2.imread("static/himym-umbrella.jpg")
+        
+        # Load user's profile image
+        response = requests.get(str(member.avatar.url))
+        user_profile_image = PILImage.open(io.BytesIO(response.content))
+        user_profile_image = user_profile_image.resize((150, 150))
+        
+        # Create a circle mask for the profile picture
+        circle_mask = np.zeros((150, 150), dtype=np.uint8)
+        cv2.circle(circle_mask, (75, 75), 75, (255), thickness=-1)
+        user_profile_image = np.array(user_profile_image.convert("RGBA"))
+        user_profile_image[..., 3] = circle_mask
+        
+        # Convert user profile image to BGR format
+        user_profile_image = cv2.cvtColor(user_profile_image, cv2.COLOR_RGBA2BGRA)
+        
+        # Define the position for the profile image on the background
+        x_offset = 725
+        y_offset = 100
+        
+        # Overlay the profile picture onto the background
+        y1, y2 = y_offset, y_offset + user_profile_image.shape[0]
+        x1, x2 = x_offset, x_offset + user_profile_image.shape[1]
+        
+        alpha_s = user_profile_image[:, :, 3] / 255.0
+        alpha_l = 1.0 - alpha_s
+        
+        for c in range(0, 3):
+            background_image[y1:y2, x1:x2, c] = (alpha_s * user_profile_image[:, :, c] + alpha_l * background_image[y1:y2, x1:x2, c])
+        
+        # Convert background image to PIL format for text drawing
+        background_image_pil = PILImage.fromarray(cv2.cvtColor(background_image, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(background_image_pil)
+        
+        # Draw text
+        font_path = "static/fonts/inter/Inter-VariableFont_opsz_wght.ttf"
+        font = ImageFont.truetype(font_path, 50)
+        
+        # Calculate text size and position using bounding box
+        def draw_centered_text(draw, text, position, font, fill):
+            bbox = draw.textbbox((0, 0), text, font=font)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+            x, y = position
+            draw.text((x - text_width / 2, y - text_height / 2), text, font=font, fill=fill)
+        
+        draw_centered_text(draw, message, (800, 400), font, DISCORD_BOT_COLOR_LIGHT)
+        draw_centered_text(draw, f"@{member.name}", (800, 500), font, DISCORD_BOT_COLOR_EXTRA_2)
+        
+        # Save to file
+        output = io.BytesIO()
+        background_image_pil.save(output, format='JPEG')
+        output.seek(0)
+        
+        file = File(fp=output, filename="welcome.jpg")
         await channel.send(f"Welcome, {member.mention}! SUIT UP!!!", file=file)
     
 async def setup(bot):
