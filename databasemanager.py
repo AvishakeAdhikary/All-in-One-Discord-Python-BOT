@@ -55,6 +55,19 @@ class DatabaseManager:
             self.client.close()
             print("MongoDB connection closed.")
 
+    def get_setting(self, setting_name):
+        try:
+            doc = self.db['settings'].find_one({'_id': setting_name})
+            return doc['value'] if doc else None
+        except PyMongoError as e:
+            print(f"An error occurred during get operation: {e}")
+
+    def set_setting(self, setting_name, value):
+        try:
+            self.db['settings'].update_one({'_id': setting_name}, {'$set': {'value': value}}, upsert=True)
+        except PyMongoError as e:
+            print(f"An error occurred during update operation: {e}")
+
 # Example usage:
 # db_manager = DatabaseManager('my_collection')
 # db_manager.insert_one('my_collection', {'name': 'Alice'})
